@@ -1,0 +1,20 @@
+{
+    "name": "anna-word",
+    "description": "a game is anna`s word",
+    "version": "1.0.0",
+    "author": "evgeny nikolaev",
+    "license": "MIT",
+    "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
+    "scripts": {
+        "dev": "bunx --bun vite --config vite/config.dev.mjs",
+        "build": "bunx --bun vite build --config vite/config.prod.mjs"
+    },
+    "devDependencies": {
+        "terser": "^5.31.0",
+        "typescript": "^5.4.5",
+        "vite": "^5.2.11"
+    },
+    "dependencies": {
+        "phaser": "3.80.1"
+    }
+}
