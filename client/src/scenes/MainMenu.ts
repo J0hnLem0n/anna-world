@@ -1,4 +1,7 @@
 import { Scene, GameObjects } from "phaser";
+import axios from "axios";
+
+const apiUrl = `http://localhost:8080`;
 
 export class MainMenu extends Scene {
   background: GameObjects.Image;
@@ -10,6 +13,7 @@ export class MainMenu extends Scene {
   }
 
   create() {
+    axios.get(apiUrl);
     this.background = this.add.image(512, 384, "background");
 
     this.title = this.add
