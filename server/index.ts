@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { jwt } from "@elysiajs/jwt";
 import { cors } from "@elysiajs/cors";
-import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import * as schema from "./schema";
 import { db } from "./db";
 
@@ -19,16 +19,11 @@ const app = new Elysia()
   .post("/sign", async ({ jwt, cookie: { auth }, params, set, body }) => {
     const { login, password } = body;
 
-    const result = await db
-      .select()
-      .from(schema.users)
-      .where(sql`${schema.users.login} = ${login}`);
+    const user = await db.query.users.findFirst({
+      where: eq(schema.users.login, login),
+    });
 
-    if (
-      result.length &&
-      result[0].hash &&
-      (await Bun.password.verify(password, result[0].hash))
-    ) {
+    if (user && (await Bun.password.verify(password, user.hash))) {
       const val = await jwt.sign(params);
       auth.set({
         value: val,
