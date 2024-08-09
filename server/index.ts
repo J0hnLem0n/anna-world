@@ -16,13 +16,19 @@ const app = new Elysia()
     })
   )
   .use(cors({ credentials: true }))
-  .post("/sign/:login", async ({ jwt, cookie: { auth }, params, set }) => {
-    const { login } = params;
+  .post("/sign", async ({ jwt, cookie: { auth }, params, set, body }) => {
+    const { login, password } = body;
+
     const result = await db
       .select()
       .from(schema.users)
       .where(sql`${schema.users.login} = ${login}`);
-    if (result.length) {
+
+    if (
+      result.length &&
+      result[0].hash &&
+      (await Bun.password.verify(password, result[0].hash))
+    ) {
       const val = await jwt.sign(params);
       auth.set({
         value: val,

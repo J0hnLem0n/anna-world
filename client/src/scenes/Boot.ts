@@ -1,9 +1,10 @@
 import { Scene } from "phaser";
 
-export enum Img {
+export enum Assets {
   background = "background",
   mainRoom = "mainRoom",
   character = "character",
+  loginForm = "loginForm",
 }
 
 export class Boot extends Scene {
@@ -12,9 +13,10 @@ export class Boot extends Scene {
   }
 
   preload() {
-    this.load.image("background", "assets/bg.png");
-    this.load.image("mainRoom", "assets/mainRoom.png");
-    this.load.image("character", "assets/character.png");
+    this.load.image(Assets.background, "assets/bg.png");
+    this.load.image(Assets.mainRoom, "assets/mainRoom.png");
+    this.load.image(Assets.character, "assets/character.png");
+    this.load.html(Assets.loginForm, "assets/login.html");
   }
 
   create() {

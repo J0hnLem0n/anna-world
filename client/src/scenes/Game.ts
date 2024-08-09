@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { Img } from "./Boot";
+import { Assets as Img } from "./Boot";
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
