@@ -21,7 +21,7 @@ export class MainMenu extends Scene {
   }
 
   async create() {
-    await api.post("/sign/anna");
+    await api.post("/sign/anna-love");
     this.background = this.add.image(512, 384, "background");
 
     this.title = this.add
