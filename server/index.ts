@@ -1,18 +1,26 @@
-import { type BodyInit, type ResponseInit } from "undici-types";
+import { Elysia } from "elysia";
+import { jwt } from "@elysiajs/jwt";
+import { cors } from "@elysiajs/cors";
 
-export class ClientResponse extends Response {
-  constructor(body?: BodyInit, init?: ResponseInit) {
-    super(body, init);
-    this.headers.set("Access-Control-Allow-Origin", "*");
-    this.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET");
-    this.headers.set("Access-Control-Allow-Headers", "Content-Type");
-  }
-}
+const port = 8080;
 
-const server = Bun.serve({
-  port: 8080,
-  fetch(req) {
-    return new ClientResponse("Bun!");
-  },
-});
-console.log(`Listening on ${server.hostname} port ${server.port} ...`);
+const app = new Elysia()
+  .use(
+    jwt({
+      name: "jwt",
+      secret: "Anna`s word",
+      exp: "7d",
+    })
+  )
+  .use(cors({ credentials: true }))
+  .post("/sign/:name", async ({ jwt, cookie: { auth }, params }) => {
+    const val = await jwt.sign(params);
+    auth.set({
+      value: val,
+      httpOnly: true,
+    });
+    return val;
+  })
+  .listen(port);
+
+console.log(`Listening on port ${port} ...`);

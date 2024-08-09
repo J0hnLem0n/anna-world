@@ -1,7 +1,15 @@
 import { Scene, GameObjects } from "phaser";
 import axios from "axios";
 
-const apiUrl = `http://localhost:8080`;
+const apiHost = `http://localhost:8080`;
+
+const api = axios.create({
+  baseURL: apiHost,
+  withCredentials: true,
+  headers: {
+    "Content-type": "application/json",
+  },
+});
 
 export class MainMenu extends Scene {
   background: GameObjects.Image;
@@ -12,8 +20,8 @@ export class MainMenu extends Scene {
     super("MainMenu");
   }
 
-  create() {
-    axios.get(apiUrl);
+  async create() {
+    await api.post("/sign/anna");
     this.background = this.add.image(512, 384, "background");
 
     this.title = this.add
