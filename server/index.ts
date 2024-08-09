@@ -4,10 +4,16 @@ import { cors } from "@elysiajs/cors";
 import { eq } from "drizzle-orm";
 import * as schema from "./schema";
 import { db } from "./db";
+import { staticPlugin } from "@elysiajs/static";
 
 const port = 8080;
+const protocol = "http";
+let baseUrl = "";
 
-const app = new Elysia()
+const app = new Elysia().listen(port);
+baseUrl = `${protocol}://${app.server?.hostname}:${app.server?.port}`;
+
+app
   .use(
     jwt({
       name: "jwt",
@@ -16,9 +22,10 @@ const app = new Elysia()
     })
   )
   .use(cors({ credentials: true }))
+  .use(staticPlugin())
   .post("/sign", async ({ jwt, cookie: { auth }, params, set, body }) => {
     const { login, password } = body;
-
+    console.log(body);
     const user = await db.query.users.findFirst({
       where: eq(schema.users.login, login),
     });
@@ -38,6 +45,13 @@ const app = new Elysia()
       message: "Invalid credentials",
     };
   })
-  .listen(port);
+  .get("/items", async () => {
+    // console.dir(Bun.file("public/table.png"));
 
-console.log(`Listening on port ${port} ...`);
+    return (await db.select().from(schema.items)).map((i) => ({
+      ...i,
+      image: baseUrl + i.image,
+    }));
+  });
+
+console.log(`Listening ${baseUrl}`);

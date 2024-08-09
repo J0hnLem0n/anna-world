@@ -9,5 +9,5 @@ export const users = sqliteTable("users", {
 
 export const items = sqliteTable("items", {
   id: integer("id").primaryKey(),
-  image: blob("image").notNull(),
+  image: text("image").notNull(),
 });

@@ -17,7 +17,7 @@ await db.insert(schema.users).values([
 
 await db.insert(schema.items).values([
   {
-    image: "test",
+    image: "/public/table.png",
   },
 ]);
 
