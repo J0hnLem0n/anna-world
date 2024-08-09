@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1723198701677,
+      "tag": "20240809101821_tiny_whistler",
+      "breakpoints": true
+    }
+  ]
+}
