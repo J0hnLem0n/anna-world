@@ -64,7 +64,11 @@ export class Game extends Scene {
             instanceDrag = self.add
               .image(pointer.x, pointer.y, Img.test)
               .setScale(0.1)
-              .setInteractive({ draggable: true });
+              .setInteractive({ draggable: true })
+              .on("drag", function (pointer) {
+                const s = this;
+                s.setPosition(pointer.x, pointer.y);
+              });
           })
           .on("drag", function (pointer, dragX, dragY) {
             instanceDrag && instanceDrag.setPosition(pointer.x, pointer.y);
@@ -121,7 +125,7 @@ export class Game extends Scene {
       const mask = new Phaser.Display.Masks.GeometryMask(self, graphics);
       itemsContainer.mask = mask;
 
-      self.input.enableDebug(itemsContainer);
+      // self.input.enableDebug(itemsContainer);
       new Phaser.Display.Masks.BitmapMask(self, itemsContainer);
       Phaser.Actions.GridAlign(itemsContainer.getAll(), {
         width: itemWidth,
