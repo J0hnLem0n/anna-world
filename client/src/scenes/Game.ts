@@ -50,10 +50,11 @@ export class Game extends Scene {
     character.setY(this.cameras.main.height - character.displayHeight);
 
     let panel: Phaser.GameObjects.NineSlice;
+    let itemsContainer: Phaser.GameObjects.Container;
 
     container.on("pointerdown", function (pointer, gameObject) {
       let instanceDrag: Phaser.GameObjects.Image | undefined = undefined;
-      const tables = new Array(50).fill(null).map(() => {
+      const tables = new Array(4).fill(null).map(() => {
         const a = self.add
           .image(-250, -1250, Img.test)
           .setScale(0.1)
@@ -104,12 +105,12 @@ export class Game extends Scene {
       const containerXPos = self.cameras.main.width - 170;
       const containerYPos = containerHeight / 2 + containerPaddingTop;
 
-      const c = self.add
+      itemsContainer = self.add
         .container(containerXPos, containerYPos, tables)
         .setSize(containerWidth, containerHeight)
         .setInteractive({ draggable: true })
         .on("drag", (point, dragX, dragY) => {
-          c.setPosition(c.x, dragY);
+          itemsContainer.setPosition(itemsContainer.x, dragY);
           console.log(point);
         });
 
@@ -118,20 +119,23 @@ export class Game extends Scene {
       graphics.fillStyle(0xfffff1);
       graphics.fillRect(menuSliceXPos, containerPaddingTop, 1000, 400);
       const mask = new Phaser.Display.Masks.GeometryMask(self, graphics);
-      c.mask = mask;
+      itemsContainer.mask = mask;
 
-      self.input.enableDebug(c);
-      new Phaser.Display.Masks.BitmapMask(self, c);
-      Phaser.Actions.GridAlign(c.getAll(), {
+      self.input.enableDebug(itemsContainer);
+      new Phaser.Display.Masks.BitmapMask(self, itemsContainer);
+      Phaser.Actions.GridAlign(itemsContainer.getAll(), {
         width: itemWidth,
         cellWidth: itemSize,
         cellHeight: itemSize,
         x: -containerWidth / 2,
-        y: -containerYPos,
+        y: -containerYPos + containerPaddingTop,
       });
     });
     this.input.on("pointerdown", function (pointer, gameObject) {
-      if (!gameObject.length) panel.destroy();
+      if (!gameObject.length) {
+        panel && panel.destroy();
+        itemsContainer && itemsContainer.destroy();
+      }
       console.log(gameObject);
     });
   }
