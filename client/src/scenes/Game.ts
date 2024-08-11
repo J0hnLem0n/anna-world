@@ -39,7 +39,13 @@ export class Game extends Scene {
         this.cameras.main.height / 2,
         Img.character
       )
-      .setInteractive({ draggable: true });
+      .setInteractive({ draggable: true })
+      .on("drag", function (pointer, dragX, dragY) {
+        character.setPosition(dragX, dragY);
+      })
+      .on("dragend", function (pointer, gameObject) {
+        // character.clearTint();
+      });
 
     character.setScale(0.3);
     character.setX(100);
@@ -48,6 +54,22 @@ export class Game extends Scene {
     let panel: Phaser.GameObjects.NineSlice;
 
     container.on("pointerdown", function (pointer, gameObject) {
+      // const n1 = self.add.image(0, 0, Img.test).setScale(0.1).setOrigin(0);
+      // const n2 = self.add.image(0, 0, Img.test).setScale(0.1).setOrigin(0);
+      // const n3 = self.add.image(0, 0, Img.test).setScale(0.1).setOrigin(0);
+
+      const tables = new Array(50).fill(null).map(() => {
+        const a = self.add
+          .image(0, 0, Img.test)
+          .setScale(0.1)
+          .setOrigin(0)
+          .setInteractive({ draggable: true })
+          .on("drag", function (pointer, dragX, dragY) {
+            a.setPosition(dragX, dragY);
+          });
+        return a;
+      });
+
       panel = self.add
         .nineslice(
           self.cameras.main.width - 380,
@@ -61,7 +83,7 @@ export class Game extends Scene {
           100,
           100
         )
-        .setOrigin(0, 0)
+        .setOrigin(0)
         .setInteractive();
       self.tweens.add({
         targets: panel,
@@ -69,17 +91,37 @@ export class Game extends Scene {
         duration: 500,
         ease: "sine.inout",
       });
+      const s = tables.reduce((acc, i) => {
+        acc = 100 + acc;
+        return acc;
+      }, 0);
+      const c = self.add
+        .container(self.cameras.main.width - 380 + 100, 50, tables)
+        .setSize(500, 2500)
+        .setInteractive({ draggable: true })
+        .on("drag", (point, dragX, dragY) => {
+          c.setPosition(c.x, dragY);
+          console.log(point);
+        });
+      console.log(c);
+      self.input.enableDebug(c);
+      // Phaser.Actions.GridAlign(c.getAll(), {
+      //   width: 2,
+      //   cellWidth: 100,
+      //   cellHeight: 100,
+      // });
+      // Phaser.Actions.GridAlign([n1, n2], {
+      //   width: 400,
+      //   height: 200,
+      //   cellWidth: 150,
+      //   cellHeight: 200,
+      //   x: 100,
+      //   y: self.cameras.main.width - 275,
+      // });
     });
 
-    this.input.setDraggable(character);
-    this.input.on("dragstart", function (pointer, gameObject) {});
-    this.input.on("drag", function (pointer, gameObject, dragX, dragY) {
-      gameObject.x = dragX;
-      gameObject.y = dragY;
-    });
-    this.input.on("dragend", function (pointer, gameObject) {
-      gameObject.clearTint();
-    });
+    // const { width, height } = container.getBounds();
+    // container.setSize(width, height);
 
     this.input.on("pointerdown", function (pointer, gameObject) {
       if (!gameObject.length) panel.destroy();

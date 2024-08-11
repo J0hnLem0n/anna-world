@@ -1,8 +1,6 @@
 import { Scene, GameObjects } from "phaser";
 import axios from "axios";
-import { Assets } from "./Boot";
-
-const apiHost = `http://localhost:8080`;
+import { apiHost, Assets } from "./Boot";
 
 const api = axios.create({
   baseURL: apiHost,
