@@ -32,13 +32,11 @@ export class Game extends Scene {
     let scaleY = this.cameras.main.height / mainRoom.height;
     let scale = Math.max(scaleX, scaleY);
     mainRoom.setScale(scale).setScrollFactor(0);
+    const widthToCenenter = this.cameras.main.width / 2;
+    const heightToCenter = this.cameras.main.height / 2;
 
     const character = this.add
-      .image(
-        this.cameras.main.width / 2,
-        this.cameras.main.height / 2,
-        Img.character
-      )
+      .image(widthToCenenter, heightToCenter, Img.character)
       .setInteractive({ draggable: true })
       .on("drag", function (pointer, dragX, dragY) {
         character.setPosition(dragX, dragY);
@@ -60,7 +58,7 @@ export class Game extends Scene {
 
       const tables = new Array(50).fill(null).map(() => {
         const a = self.add
-          .image(0, 0, Img.test)
+          .image(-250, -1250, Img.test)
           .setScale(0.1)
           .setOrigin(0)
           .setInteractive({ draggable: true })
@@ -69,10 +67,10 @@ export class Game extends Scene {
           });
         return a;
       });
-
+      const menuSliceXPos = self.cameras.main.width - 380;
       panel = self.add
         .nineslice(
-          self.cameras.main.width - 380,
+          menuSliceXPos,
           0,
           Assets.manuItems,
           "PopupBackground400",
@@ -91,38 +89,44 @@ export class Game extends Scene {
         duration: 500,
         ease: "sine.inout",
       });
-      const s = tables.reduce((acc, i) => {
-        acc = 100 + acc;
+      const itemSize = 100;
+      const itemWidth = 2;
+      const containerPaddingTop = 100;
+      const allItemsHeight = tables.reduce((acc, i) => {
+        acc = itemSize + acc;
         return acc;
       }, 0);
+      const containerWidth = 300;
+      const containerHeight = allItemsHeight / itemWidth;
+      const containerXPos = self.cameras.main.width - 170;
+      const containerYPos = containerHeight / 2 + containerPaddingTop;
+
       const c = self.add
-        .container(self.cameras.main.width - 380 + 100, 50, tables)
-        .setSize(500, 2500)
+        .container(containerXPos, containerYPos, tables)
+        .setSize(containerWidth, containerHeight)
         .setInteractive({ draggable: true })
         .on("drag", (point, dragX, dragY) => {
           c.setPosition(c.x, dragY);
           console.log(point);
         });
       console.log(c);
+      const graphics = self.make.graphics();
+
+      graphics.fillStyle(0xfffff1);
+      graphics.fillRect(menuSliceXPos, containerPaddingTop, 1000, 400);
+      const mask = new Phaser.Display.Masks.GeometryMask(self, graphics);
+      c.mask = mask;
+
       self.input.enableDebug(c);
-      // Phaser.Actions.GridAlign(c.getAll(), {
-      //   width: 2,
-      //   cellWidth: 100,
-      //   cellHeight: 100,
-      // });
-      // Phaser.Actions.GridAlign([n1, n2], {
-      //   width: 400,
-      //   height: 200,
-      //   cellWidth: 150,
-      //   cellHeight: 200,
-      //   x: 100,
-      //   y: self.cameras.main.width - 275,
-      // });
+      new Phaser.Display.Masks.BitmapMask(self, c);
+      Phaser.Actions.GridAlign(c.getAll(), {
+        width: itemWidth,
+        cellWidth: itemSize,
+        cellHeight: itemSize,
+        x: -containerWidth / 2,
+        y: -containerYPos,
+      });
     });
-
-    // const { width, height } = container.getBounds();
-    // container.setSize(width, height);
-
     this.input.on("pointerdown", function (pointer, gameObject) {
       if (!gameObject.length) panel.destroy();
       console.log(gameObject);
