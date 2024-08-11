@@ -52,18 +52,21 @@ export class Game extends Scene {
     let panel: Phaser.GameObjects.NineSlice;
 
     container.on("pointerdown", function (pointer, gameObject) {
-      // const n1 = self.add.image(0, 0, Img.test).setScale(0.1).setOrigin(0);
-      // const n2 = self.add.image(0, 0, Img.test).setScale(0.1).setOrigin(0);
-      // const n3 = self.add.image(0, 0, Img.test).setScale(0.1).setOrigin(0);
-
+      let instanceDrag: Phaser.GameObjects.Image | undefined = undefined;
       const tables = new Array(50).fill(null).map(() => {
         const a = self.add
           .image(-250, -1250, Img.test)
           .setScale(0.1)
           .setOrigin(0)
           .setInteractive({ draggable: true })
+          .on("dragstart", function (pointer) {
+            instanceDrag = self.add
+              .image(pointer.x, pointer.y, Img.test)
+              .setScale(0.1)
+              .setInteractive({ draggable: true });
+          })
           .on("drag", function (pointer, dragX, dragY) {
-            a.setPosition(dragX, dragY);
+            instanceDrag && instanceDrag.setPosition(pointer.x, pointer.y);
           });
         return a;
       });
@@ -109,7 +112,7 @@ export class Game extends Scene {
           c.setPosition(c.x, dragY);
           console.log(point);
         });
-      console.log(c);
+
       const graphics = self.make.graphics();
 
       graphics.fillStyle(0xfffff1);
