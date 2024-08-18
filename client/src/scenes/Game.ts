@@ -57,13 +57,12 @@ export class Game extends Scene {
       const tables = new Array(4).fill(null).map(() => {
         const a = self.add
           .image(-250, -1250, Img.test)
-          .setScale(0.1)
+          .setDisplaySize(100, 100)
           .setOrigin(0)
           .setInteractive({ draggable: true })
           .on("dragstart", function (pointer) {
             instanceDrag = self.add
               .image(pointer.x, pointer.y, Img.test)
-              .setScale(0.1)
               .setInteractive({ draggable: true })
               .on("drag", function (pointer) {
                 const s = this;
@@ -115,7 +114,6 @@ export class Game extends Scene {
         .setInteractive({ draggable: true })
         .on("drag", (point, dragX, dragY) => {
           itemsContainer.setPosition(itemsContainer.x, dragY);
-          console.log(point);
         });
 
       const graphics = self.make.graphics();
