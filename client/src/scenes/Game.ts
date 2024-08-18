@@ -1,6 +1,18 @@
 import { Scene } from "phaser";
 import { Assets, Assets as Img } from "./Boot";
 
+const initialRemoveArea = function (scene: Scene) {
+  const circle = scene.add.circle(0, 0, 30, 0xa60e1a, 0.1);
+  const textConfig = { fontSize: "40px", color: "white", fontFamily: "Arial" };
+  const Text = scene.add.text(-10, -20, "-", textConfig);
+  const container = scene.add
+    .container(60, 60, [circle, Text])
+    .setSize(circle.width, circle.height)
+    .setInteractive();
+  scene.physics.add.existing(container);
+  return { removeArea: container };
+};
+
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   background: Phaser.GameObjects.Image;
@@ -21,13 +33,17 @@ export class Game extends Scene {
     );
 
     const circle = this.add.circle(0, 0, 30, 0xa60e1a, 0.1);
-    var textConfig = { fontSize: "40px", color: "white", fontFamily: "Arial" };
+    const textConfig = {
+      fontSize: "40px",
+      color: "white",
+      fontFamily: "Arial",
+    };
     const Text = this.add.text(-10, -20, "+", textConfig);
     const container = this.add
       .container(this.cameras.main.width - 60, 60, [circle, Text])
       .setSize(circle.width, circle.height)
       .setInteractive();
-
+    const { removeArea } = initialRemoveArea(this);
     let scaleX = this.cameras.main.width / mainRoom.width;
     let scaleY = this.cameras.main.height / mainRoom.height;
     let scale = Math.max(scaleX, scaleY);
@@ -67,10 +83,32 @@ export class Game extends Scene {
               .on("drag", function (pointer) {
                 const s = this;
                 s.setPosition(pointer.x, pointer.y);
+              })
+              .on("dragend", function (pointer) {
+                if (instanceDrag) {
+                  self.physics.add.existing(instanceDrag);
+                  const image = this;
+                  console.log(this);
+                  removeArea &&
+                    self.physics.collide(image, removeArea, function () {
+                      image?.destroy();
+                    });
+                }
               });
           })
           .on("drag", function (pointer, dragX, dragY) {
-            instanceDrag && instanceDrag.setPosition(pointer.x, pointer.y);
+            if (instanceDrag) {
+              instanceDrag.setPosition(pointer.x, pointer.y);
+            }
+          })
+          .on("dragend", function (pointer) {
+            if (instanceDrag) {
+              self.physics.add.existing(instanceDrag);
+              removeArea &&
+                self.physics.collide(instanceDrag, removeArea, function () {
+                  instanceDrag?.destroy();
+                });
+            }
           });
         return a;
       });
