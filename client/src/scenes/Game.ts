@@ -20,12 +20,16 @@ export class Game extends Scene {
 
   constructor() {
     super("Game");
+    this.items = [];
+  }
+  init(data) {
+    this.items = data;
   }
 
   create() {
     const self = this;
     this.camera = this.cameras.main;
-
+    console.log(this.textures);
     const mainRoom = this.add.image(
       this.cameras.main.width / 2,
       this.cameras.main.height / 2,
@@ -70,15 +74,16 @@ export class Game extends Scene {
 
     container.on("pointerdown", function (pointer, gameObject) {
       let instanceDrag: Phaser.GameObjects.Image | undefined = undefined;
-      const tables = new Array(4).fill(null).map(() => {
+      console.log(self.items);
+      const tables = self.items.map((item) => {
         const a = self.add
-          .image(-250, -1250, Img.test)
+          .image(-250, -1250, item.id)
           .setDisplaySize(100, 100)
           .setOrigin(0)
           .setInteractive({ draggable: true })
           .on("dragstart", function (pointer) {
             instanceDrag = self.add
-              .image(pointer.x, pointer.y, Img.test)
+              .image(pointer.x, pointer.y, item.id)
               .setInteractive({ draggable: true })
               .on("drag", function (pointer) {
                 const s = this;
@@ -88,7 +93,6 @@ export class Game extends Scene {
                 if (instanceDrag) {
                   self.physics.add.existing(instanceDrag);
                   const image = this;
-                  console.log(this);
                   removeArea &&
                     self.physics.collide(image, removeArea, function () {
                       image?.destroy();
@@ -176,7 +180,6 @@ export class Game extends Scene {
         panel && panel.destroy();
         itemsContainer && itemsContainer.destroy();
       }
-      console.log(gameObject);
     });
   }
 }

@@ -1,8 +1,26 @@
 import { Scene } from "phaser";
+import { Assets } from "./Boot";
+import axios from "axios";
+
+export const apiHost = `http://localhost:8080`;
+const Api = axios.create({ baseURL: apiHost });
+
+type Items = { id: number; image: string }[];
+
+const getItems = () =>
+  new Promise<Items>(async (res, rej) => {
+    try {
+      const r: Items = await Api.get("/items");
+      res(r);
+    } catch {
+      rej("axios error");
+    }
+  });
 
 export class Preloader extends Scene {
   constructor() {
     super("Preloader");
+    this.items = [];
   }
 
   init() {
@@ -23,16 +41,32 @@ export class Preloader extends Scene {
   }
 
   preload() {
-    //  Load the assets for the game - Replace with your own assets
-    this.load.setPath("assets");
-    this.load.image("logo", "logo.png");
+    getItems().then((r) => {
+      r?.data.forEach((e) => {
+        this.items.push(e);
+        this.load.image(e.id.toString(), e.image);
+      });
+    });
+
+    this.load.image(Assets.test, [`${apiHost}/public/table.png`]);
+
+    this.load.image(Assets.background, "assets/bg.png");
+    this.load.image(Assets.mainRoom, "assets/mainRoom.png");
+    this.load.image(Assets.character, "assets/character.png");
+    this.load.atlas(
+      Assets.manuItems,
+      "assets/nine-slice.png",
+      "assets/nine-slice.json"
+    );
+    this.load.html(Assets.loginForm, "assets/login.html");
+    this.load.html(Assets.loginForm, "assets/login.html");
+    this.load.html(Assets.loginForm, "assets/login.html");
   }
 
   create() {
     //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
     //  For example, you can define global animations here, so we can use them in other scenes.
-
     //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-    this.scene.start("Game");
+    this.scene.start("Game", this.items);
   }
 }
