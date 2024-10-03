@@ -6,6 +6,7 @@ import * as schema from "./schema";
 import { db } from "./db";
 import { staticPlugin } from "@elysiajs/static";
 import crypto from "crypto";
+import { items } from "./schema.ts";
 
 const port = 8080;
 const protocol = "http";
@@ -51,10 +52,11 @@ app
     async ({ body, redirect }) => {
       const fileName = body.file.name;
       if (!fileName) throw new Error("Must upload a file.");
-      await Bun.write(
-        `public/${crypto.randomUUID()}.${fileName.split(".").pop()}`,
-        body.file
-      );
+      const savedFileName = `public/${crypto.randomUUID()}.${fileName
+        .split(".")
+        .pop()}`;
+      await Bun.write(savedFileName, body.file);
+      await db.insert(items).values({ image: `/${savedFileName}` });
       // return { res: "/" };
       return redirect("http://localhost:3000/upload.html");
     },
