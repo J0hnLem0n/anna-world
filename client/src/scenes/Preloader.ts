@@ -2,8 +2,8 @@ import { Scene } from "phaser";
 import { Assets } from "./Boot";
 import axios from "axios";
 
-export const apiHost = `http://localhost:8080`;
-const Api = axios.create({ baseURL: apiHost });
+export const apiUrl = import.meta.env.API_URL;
+const Api = axios.create({ baseURL: apiUrl });
 
 type Items = { id: number; image: string }[];
 
@@ -48,7 +48,7 @@ export class Preloader extends Scene {
       });
     });
 
-    this.load.image(Assets.test, [`${apiHost}/public/table.png`]);
+    this.load.image(Assets.test, [`${apiUrl}/public/table.png`]);
 
     this.load.image(Assets.background, "assets/bg.png");
     this.load.image(Assets.mainRoom, "assets/mainRoom.png");

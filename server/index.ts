@@ -11,6 +11,7 @@ import { items } from "./schema.ts";
 const port = 8080;
 const protocol = "http";
 let baseUrl = "";
+const basePath = "/api";
 
 const app = new Elysia().listen(port);
 baseUrl = `${protocol}://${app.server?.hostname}:${app.server?.port}`;
@@ -25,31 +26,34 @@ app
   )
   .use(cors({ credentials: true }))
   .use(staticPlugin())
-  .post("/sign", async ({ jwt, cookie: { auth }, params, set, body }) => {
-    const { login, password } = body;
-    console.log(body);
-    const user = await db.query.users.findFirst({
-      where: eq(schema.users.login, login),
-    });
-
-    if (user && (await Bun.password.verify(password, user.hash))) {
-      const val = await jwt.sign(params);
-      auth.set({
-        value: val,
-        httpOnly: true,
-      });
-      return val;
-    }
-    set.status = 400;
-    return {
-      success: false,
-      data: null,
-      message: "Invalid credentials",
-    };
-  })
   .post(
-    "/item",
-    async ({ body, redirect }) => {
+    `${basePath}/sign`,
+    async ({ jwt, cookie: { auth }, params, set, body }) => {
+      const { login, password } = body;
+      console.log(body);
+      const user = await db.query.users.findFirst({
+        where: eq(schema.users.login, login),
+      });
+
+      if (user && (await Bun.password.verify(password, user.hash))) {
+        const val = await jwt.sign(params);
+        auth.set({
+          value: val,
+          httpOnly: true,
+        });
+        return val;
+      }
+      set.status = 400;
+      return {
+        success: false,
+        data: null,
+        message: "Invalid credentials",
+      };
+    }
+  )
+  .post(
+    `${basePath}/item`,
+    async ({ body, redirect, request }) => {
       const fileName = body.file.name;
       if (!fileName) throw new Error("Must upload a file.");
       const savedFileName = `public/${crypto.randomUUID()}.${fileName
@@ -57,8 +61,8 @@ app
         .pop()}`;
       await Bun.write(savedFileName, body.file);
       await db.insert(items).values({ image: `/${savedFileName}` });
-      // return { res: "/" };
-      return redirect("http://localhost:3000/upload.html");
+      console.log(request?.headers);
+      return redirect(`${request?.headers.get("origin")}/upload.html`);
     },
     {
       body: t.Object({
@@ -66,7 +70,7 @@ app
       }),
     }
   )
-  .get("/items", async () => {
+  .get(`${basePath}/items`, async () => {
     return (await db.select().from(schema.items)).map((i) => ({
       ...i,
       image: baseUrl + i.image,

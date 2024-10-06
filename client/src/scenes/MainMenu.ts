@@ -1,10 +1,10 @@
 import { Scene, GameObjects } from "phaser";
 import axios from "axios";
 import { Assets } from "./Boot";
-import { apiHost } from "./Preloader";
+import { apiUrl } from "./Preloader";
 
 const api = axios.create({
-  baseURL: apiHost,
+  baseURL: apiUrl,
   withCredentials: true,
   headers: {
     "Content-type": "application/json",
