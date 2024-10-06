@@ -73,7 +73,7 @@ app
   .get(`${basePath}/items`, async () => {
     return (await db.select().from(schema.items)).map((i) => ({
       ...i,
-      image: baseUrl + i.image,
+      image: i.image,
     }));
   });
 
